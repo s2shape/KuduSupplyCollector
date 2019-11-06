@@ -5,11 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Kudu.Client" Version="1.0.0" />
     <PackageReference Include="S2.SupplyCollector" Version="1.1.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\test\kudu-client-net\src\Kudu.Client\Kudu.Client.csproj" />
   </ItemGroup>
 
 </Project>
