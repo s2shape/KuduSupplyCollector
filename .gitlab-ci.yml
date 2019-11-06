@@ -7,8 +7,8 @@ stages:
 variables:
   KUDU_HOST: kudu
   KUDU_PORT: "7051"
-  KUDU_MASTER_EXTRA_OPTS: "--webserver_advertised_addresses localhost:8051 --rpc_advertised_addresses localhost:7051"
-  KUDU_TSERVER_EXTRA_OPTS: "--webserver_advertised_addresses localhost:8050 --rpc_advertised_addresses localhost:7050"
+  KUDU_MASTER_EXTRA_OPTS: "--block_manager=file --webserver_advertised_addresses kudu:8051 --rpc_advertised_addresses kudu:7051"
+  KUDU_TSERVER_EXTRA_OPTS: "--block_manager=file --webserver_advertised_addresses kudu:8050 --rpc_advertised_addresses kudu:7050"
   COMPlus_DebugWriteToStdErr: "1"
 
 before_script:
