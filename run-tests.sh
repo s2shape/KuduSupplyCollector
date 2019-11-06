@@ -1,5 +1,9 @@
 #!/bin/bash
-docker run -d --rm --name kudu -p 8050:8050 -p 8051:8051 -p 7050:7050 -p 7051:7051 s2shape/kudu-dev
+docker run -d --rm --name kudu -p 8050:8050 -p 8051:8051 -p 7050:7050 -p 7051:7051 \
+-e KUDU_MASTER_EXTRA_OPTS='--webserver_advertised_addresses localhost:8051 --rpc_advertised_addresses localhost:7051' \
+-e KUDU_TSERVER_EXTRA_OPTS='--webserver_advertised_addresses localhost:8050 --rpc_advertised_addresses localhost:7050' \
+s2shape/kudu-dev
+
 sleep 10
 
 export KUDU_HOST=localhost

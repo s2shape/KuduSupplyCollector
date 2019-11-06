@@ -21,12 +21,14 @@ namespace KuduSupplyCollectorLoader
             var host = hostPort[0];
             var port = Int32.Parse(hostPort[1]);
 
-            return new KuduClient(new KuduClientOptions()
+            var client = new KuduClient(new KuduClientOptions()
             {
                 MasterAddresses = new List<HostAndPort>() {
                     new HostAndPort(host, port)
                 }
             });
+
+            return client;
         }
 
         public override void InitializeDatabase(DataContainer dataContainer) {
@@ -63,11 +65,20 @@ namespace KuduSupplyCollectorLoader
 
             var builder = new TableBuilder();
             builder.SetTableName(name);
+            builder.SetNumReplicas(1);
+
+            builder.AddColumn(columnBuilder => {
+                columnBuilder.Name = "id";
+                columnBuilder.IsKey = true;
+                columnBuilder.Type = KuduType.Int64;
+            });
 
             foreach (var column in columns) {
                 builder.AddColumn(columnBuilder => {
                     columnBuilder.Name = column.Name;
                     columnBuilder.Type = ConvertDataType(column.DataType);
+                    columnBuilder.IsKey = false;
+                    columnBuilder.IsNullable = true;
                 });
             }
 
@@ -91,22 +102,23 @@ namespace KuduSupplyCollectorLoader
 
                 var insert = tbl.NewInsert();
 
+                insert.Row.SetInt64(0, rows);
                 for (int i = 0; i < dataEntities.Length; i++) {
                     switch (dataEntities[i].DataType) {
                         case DataType.Boolean:
-                            insert.Row.SetBool(i, r.Next(100) > 50);
+                            insert.Row.SetBool(i + 1, r.Next(100) > 50);
                             break;
                         case DataType.Int:
-                            insert.Row.SetInt32(i, r.Next());
+                            insert.Row.SetInt32(i + 1, r.Next());
                             break;
                         case DataType.String:
-                            insert.Row.SetString(i, Guid.NewGuid().ToString());
+                            insert.Row.SetString(i + 1, Guid.NewGuid().ToString());
                             break;
                         case DataType.Double:
-                            insert.Row.SetDouble(i, r.NextDouble());
+                            insert.Row.SetDouble(i + 1, r.NextDouble());
                             break;
                         case DataType.DateTime:
-                            insert.Row.SetDateTime(i, DateTimeOffset
+                            insert.Row.SetDateTime(i + 1, DateTimeOffset
                                 .FromUnixTimeMilliseconds(
                                     DateTimeOffset.Now.ToUnixTimeMilliseconds() + r.Next()).DateTime);
                             break;
@@ -134,11 +146,14 @@ namespace KuduSupplyCollectorLoader
                 var header = reader.ReadLine();
                 var columnsNames = header.Split(",");
 
+                Console.WriteLine($"Creating table {tableName}");
                 var tbl = CreateTable(conn, tableName,
                     columnsNames.Select(x => new DataEntity(x, DataType.String, "string", container, collection)).ToArray());
 
                 var session = conn.NewSession(new KuduSessionOptions());
 
+                long rows = 0;
+                Console.WriteLine("Adding rows...");
                 while (!reader.EndOfStream)
                 {
                     var line = reader.ReadLine();
@@ -148,14 +163,16 @@ namespace KuduSupplyCollectorLoader
                     var insert = tbl.NewInsert();
                     var cells = line.Split(",");
 
+                    insert.Row.SetInt64(0, rows++);
                     for (int i = 0; i < cells.Length && i < columnsNames.Length; i++)
                     {
-                        insert.Row.SetString(i, cells[i]);
+                        insert.Row.SetString(i + 1, cells[i]);
                     }
 
                     session.EnqueueAsync(insert).GetAwaiter().GetResult();
                 }
 
+                Console.WriteLine("Save and close");
                 session.FlushAsync().Wait();
 
                 session.DisposeAsync().GetAwaiter().GetResult();

@@ -48,7 +48,7 @@ namespace KuduSupplyCollectorTests
             var (tables, elements) = _instance.GetSchema(_container);
 
             Assert.Equal(1, tables.Count);
-            Assert.Equal(39, elements.Count);
+            Assert.Equal(40, elements.Count);
             foreach (DataEntity element in elements)
             {
                 Assert.NotEqual(string.Empty, element.DbDataType);
@@ -62,7 +62,7 @@ namespace KuduSupplyCollectorTests
             Assert.Equal(4, samples.Count);
             samples = _instance.CollectSample(_emailToAddress, 200);
             Assert.Equal(200, samples.Count);
-            Assert.Contains("qa25@example.com", samples);
+            Assert.Contains("info90@example.edu", samples);
         }
 
     }

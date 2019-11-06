@@ -5,6 +5,7 @@ A supply collector designed to connect to Apache Kudu
 ## Known issues
 
 * Don't know how to request row count and table size - so metrics don't work
+* Random sampling doesn't work
 
 ## Requirements
 
