@@ -24,6 +24,7 @@ test:
   services:
     - name: s2shape/kudu-dev
       alias: kudu
+      entrypoint: ["/bin/sh","-c" ,'echo "127.0.0.1 kudu">>/etc/hosts && /entrypoint']
 
   script:
     - ROOT_PROJECT_PATH=$(pwd)
@@ -41,6 +42,7 @@ load_test:
   services:
     - name: s2shape/kudu-dev
       alias: kudu
+      entrypoint: ["/bin/sh","-c" ,'echo "127.0.0.1 kudu">>/etc/hosts && /entrypoint']
 
   script:
     - ROOT_PROJECT_PATH=$(pwd)
