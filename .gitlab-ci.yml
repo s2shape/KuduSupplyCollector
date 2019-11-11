@@ -7,8 +7,8 @@ stages:
 variables:
   KUDU_HOST: kudu
   KUDU_PORT: "7051"
-  KUDU_MASTER_EXTRA_OPTS: "--block_manager=file --webserver_advertised_addresses kudu:8051 --rpc_advertised_addresses kudu:7051"
-  KUDU_TSERVER_EXTRA_OPTS: "--block_manager=file --webserver_advertised_addresses kudu:8050 --rpc_advertised_addresses kudu:7050"
+  KUDU_MASTER_EXTRA_OPTS: "--block_manager=file --webserver_advertised_addresses 172.17.0.2:8051 --rpc_advertised_addresses 172.17.0.2:7051"
+  KUDU_TSERVER_EXTRA_OPTS: "--block_manager=file --webserver_advertised_addresses 172.17.0.2:8050 --rpc_advertised_addresses 172.17.0.2:7050"
   COMPlus_DebugWriteToStdErr: "1"
 
 before_script:
@@ -24,9 +24,9 @@ test:
   services:
     - name: s2shape/kudu-dev
       alias: kudu
-      entrypoint: ["/bin/sh","-c" ,'echo "127.0.0.1 kudu">>/etc/hosts && /entrypoint']
 
   script:
+    - cat /etc/hosts
     - ROOT_PROJECT_PATH=$(pwd)
     - dotnet build
     - dotnet publish
@@ -42,7 +42,6 @@ load_test:
   services:
     - name: s2shape/kudu-dev
       alias: kudu
-      entrypoint: ["/bin/sh","-c" ,'echo "127.0.0.1 kudu">>/etc/hosts && /entrypoint']
 
   script:
     - ROOT_PROJECT_PATH=$(pwd)
