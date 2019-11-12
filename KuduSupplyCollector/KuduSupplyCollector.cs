@@ -42,6 +42,11 @@ namespace KuduSupplyCollector
 
             var conn = Connect(dataEntity.Container.ConnectionString);
             var table = conn.OpenTableAsync(dataEntity.Collection.Name).Result;
+            var column = table.Schema.Columns.FirstOrDefault(x => x.Name.Equals(dataEntity.Name));
+
+            if (column == null) {
+                throw new ArgumentOutOfRangeException($"Missing column {dataEntity.Name} in {dataEntity.Collection.Name}!");
+            }
 
             var builder = conn.NewScanBuilder(table);
             builder.SetLimit(sampleSize);
@@ -51,7 +56,8 @@ namespace KuduSupplyCollector
             var enumerator = scanner.GetAsyncEnumerator();
             while (enumerator.MoveNextAsync().Result) {
                 foreach (var row in enumerator.Current) {
-                    results.Add(row.GetString(0));
+                    var value = column.Type == KuduType.String ? row.GetString(0) : row.GetInt32(0).ToString();
+                    results.Add(value);
                 }
             }
 
