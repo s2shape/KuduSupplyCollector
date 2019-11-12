@@ -9,6 +9,6 @@ A supply collector designed to connect to Apache Kudu
 
 ## Requirements
 
-Needs kudu docker image for tests. Use e.g. this one: https://github.com/MartinWeindel/kudu-docker-slim 
+Needs kudu docker image for tests. Copied and modified this one: https://github.com/MartinWeindel/kudu-docker-slim (see `docker` folder)	
 
 Prebuilt image is stored at Docker hub as s2shape/kudu-dev

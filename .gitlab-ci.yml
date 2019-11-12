@@ -16,6 +16,9 @@ build:
   stage: build
   script:
     - dotnet build
+  except:
+    changes:
+      - "*.md"
 
 test:
   stage: test
@@ -35,6 +38,10 @@ test:
     - cd $ROOT_PROJECT_PATH
     - dotnet test
 
+  except:
+    changes:
+      - "*.md"
+
 load_test:
   stage: test
   services:
@@ -52,3 +59,7 @@ load_test:
     - dotnet SupplyCollectorDataLoader.dll -samples KuduSupplyCollector kudu://$KUDU_HOST:$KUDU_PORT TestCollection Test1:int,Test2:string,Test3:bool,Test4:double,Test5 1000000
     - cd $ROOT_PROJECT_PATH/KuduSupplyCollectorTests/bin/Debug/netcoreapp2.2/publish
     - SupplyCollectorTestHarness
+
+  except:
+    changes:
+      - "*.md"
